@@ -50,6 +50,13 @@ def tokenize_data(data):
             tokens.append(tkn)
     return tokens
 
+def is_number(data):
+    try:
+        float(data)
+    except Exception:
+        return False
+    return True
+
 def is_valid_json(data):
     section_starter = ["{", "["]
     section_ender = ["}", "]"]
@@ -65,7 +72,7 @@ def is_valid_json(data):
         # string detection
         if tkn[0] == "'":
             return False
-        if tkn[0] == "\"":
+        elif tkn[0] == "\"":
             if tkn[-1] != "\"":
                 return False
             if len(statement) == 0:
@@ -77,24 +84,35 @@ def is_valid_json(data):
                 return False
 
         # seperator detection
-        if tkn == ":":
+        elif tkn == ":":
             if len(statement) != 1:
                 return False
             statement.append(tkn)
-        if tkn == ",":
+        elif tkn == ",":
             if len(statement) != 3:
                 return False
             statement = []
             is_comma = True
         # section detection
-        if tkn in section_starter:
+        elif tkn in section_starter:
             stack.append(section_ender[section_starter.index(tkn)])
         elif tkn in section_ender:
             if len(stack) == 0 or stack[-1] != tkn:
                 return False
             stack.pop()
 
+        # boolean and number
+        elif tkn == "true" or tkn == "false" or tkn == "null"  or is_number(tkn):
+            if len(statement) != 2:
+                return False
+            statement.append(tkn)
+        else:
+            return False
+
+
     # check for rouge commas
     if len(statement) == 0 and is_comma:
         return False
     return True
+
+print(is_valid_json("tests/step3/valid.json"))
