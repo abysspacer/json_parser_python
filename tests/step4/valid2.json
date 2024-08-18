@@ -2,8 +2,8 @@
   "key": "value",
   "key-n": 101,
   "key-o": {
-    "inner-key": "inner-value",
+    "inner key": "inner value",
     "key-2": "iv2"
   },
-  "key-l": ["list-value", "two", 123]
+  "key-l": ["list value", "two", 123]
 }

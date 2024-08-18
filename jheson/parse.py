@@ -1,53 +1,37 @@
 from utils import get_ready_to_parse_data
 
 def tokenize_data(data):
-    section_starter = ["{", "["]
-    section_ender = ["}", "]"]
-    seperator = [":", ","]
 
-    def tokenize(string): 
-        if string == "": return []
-        tkn_lst = []
-
-        # check for string
-        if "\"" in string:
-            first_quote_index = string.index("\"")
-            sub_string_one = string[0: first_quote_index]
-            for tkn in tokenize(sub_string_one):
-                tkn_lst.append(tkn)
-            if "\"" in string[first_quote_index + 1:]:
-                second_quote_index = first_quote_index + string[first_quote_index + 1:].index("\"") + 1
-                tkn_lst.append(string[first_quote_index: second_quote_index + 1])
-                if second_quote_index + 1 < len(string):
-                    sub_string_two = string[second_quote_index + 1:]
-                    for tkn in tokenize(sub_string_two):
-                        tkn_lst.append(tkn)
-            else:
-                tkn_lst.append(string[first_quote_index:])
-            return tkn_lst
-
-        # check for section delimiters
-        for indicator in section_starter + section_ender + seperator:
-            if indicator in string:
-                # initial split
-                tkns = string.split(indicator)
-                # sub_token__1
-                sub_tkns = tokenize(tkns[0])
-                for sbtkn in sub_tkns:
-                    tkn_lst.append(sbtkn)
-                tkn_lst.append(indicator)
-                # sub_token__2
-                sub_tkns = tokenize(tkns[-1])
-                for sbtkn in sub_tkns:
-                    tkn_lst.append(sbtkn)
-                return tkn_lst
-        return [string]
-
-    ready_to_tokenize = get_ready_to_parse_data(data).split()
+    ready_to_tokenize = get_ready_to_parse_data(data)
+    if len(ready_to_tokenize) == 0:
+        return []
     tokens = []
-    for string in ready_to_tokenize:
-        for tkn in tokenize(string):
-            tokens.append(tkn)
+    i = 0
+    seperators = ["{", "}", "[", "]", ",", ":"]
+    while i < len(ready_to_tokenize):
+        # check for strings
+        if ready_to_tokenize[i] == "\"":
+            start_index = i
+            i += 1
+            while ready_to_tokenize[i] != "\"" and i + 1 < len(ready_to_tokenize):
+                i += 1
+            if i + 1 >= len(ready_to_tokenize):
+                tokens.append(ready_to_tokenize[start_index:])
+            else:
+                tokens.append(ready_to_tokenize[start_index: i + 1])
+        
+        # seperator check
+        elif ready_to_tokenize[i] in seperators:
+            tokens.append(ready_to_tokenize[i])
+        # basic check
+        elif not ready_to_tokenize[i].isspace() and not (ready_to_tokenize[i] in seperators):
+            start_index = i
+            i += 1
+            while not ready_to_tokenize[i].isspace() and not (ready_to_tokenize[i] in seperators) and i + 1 < len(ready_to_tokenize):
+                i += 1
+            tokens.append(ready_to_tokenize[start_index : i])
+            continue
+        i += 1
     return tokens
 
 def is_number(data):
@@ -192,4 +176,20 @@ def is_valid_json(data):
         return False
     return True
 
-print(is_valid_json("tests/step4/valid2.json"))
+tests = [
+    "tests/step1/valid.json",
+    "tests/step1/invalid.json",
+    "tests/step2/valid.json",
+    "tests/step2/valid2.json",
+    "tests/step2/invalid.json",
+    "tests/step2/invalid2.json",
+    "tests/step3/valid.json",
+    "tests/step3/invalid.json",
+    "tests/step4/valid.json",
+    "tests/step4/valid2.json",
+    "tests/step4/invalid.json",
+        ]
+
+for test in tests:
+    print(test)
+    print(is_valid_json(test))
