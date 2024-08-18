@@ -41,11 +41,10 @@ def is_number(data):
         return False
     return True
 
-def is_valid_json(data):
+def is_valid_json(tokens):
     section_starter = ["{", "["]
     section_ender = ["}", "]"]
     
-    tokens = tokenize_data(data)
     # basic invalid cases
     if len(tokens) == 0 or (tokens[0] not in section_starter) or (tokens[-1] not in section_ender) or section_ender.index(tokens[-1]) != section_starter.index(tokens[0]): return False
 
@@ -145,16 +144,15 @@ def is_valid_json(data):
             elif tkn in section_starter:
                 statement.append(True)
                 layer_stack_height = len(stack)
-                stack.append(section_ender[section_starter.index(tkn)])
                 for j in range(i, len(tokens)):
                     if tokens[j] in section_starter:
-                        stack.append(section_ender[section_starter.index(tkn)])
-                    elif tkn in section_ender:
-                        if len(stack) == 0 or stack[-1] != tkn:
+                        stack.append(section_ender[section_starter.index(tokens[j])])
+                    elif tokens[j] in section_ender:
+                        if len(stack) == 0 or stack[-1] != tokens[j]:
                             return False
                         stack.pop()
                         if len(stack) == layer_stack_height:
-                            if not is_valid_json(" ".join(tokens[i, j + 1])): 
+                            if not is_valid_json(" ".join(tokens[i: j + 1])):
                                 return False
                             i = j
                             break
@@ -176,20 +174,3 @@ def is_valid_json(data):
         return False
     return True
 
-tests = [
-    "tests/step1/valid.json",
-    "tests/step1/invalid.json",
-    "tests/step2/valid.json",
-    "tests/step2/valid2.json",
-    "tests/step2/invalid.json",
-    "tests/step2/invalid2.json",
-    "tests/step3/valid.json",
-    "tests/step3/invalid.json",
-    "tests/step4/valid.json",
-    "tests/step4/valid2.json",
-    "tests/step4/invalid.json",
-        ]
-
-for test in tests:
-    print(test)
-    print(is_valid_json(test))
