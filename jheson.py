@@ -1,4 +1,11 @@
-from utils import get_ready_to_parse_data
+from os import path
+
+def read_from_file(file_path):
+    with open(file_path, "r") as fh:
+        return fh.read()
+
+def get_ready_to_parse_data(data):
+    return read_from_file(data) if path.isfile(data) else data
 
 def tokenize_data(data):
 
@@ -348,8 +355,6 @@ def parse_json(data):
     if len(statement) == 0 and is_comma:
         throw_error(",")
     elif len(statement):
-        #TODO: add number eval here
-        #TODO: add null and bool eval
         if lex_char == 2:
             if is_number(statement[0]):
                 arr.append(string_to_number(statement[0]))
@@ -380,27 +385,3 @@ def parse_json(data):
         return dic
     else:
         return arr
-
-
-tests = [
-    "tests/step1/valid.json",
-    "tests/step1/invalid.json",
-    "tests/step2/valid.json",
-    "tests/step2/valid2.json",
-    "tests/step2/invalid.json",
-    "tests/step2/invalid2.json",
-    "tests/step3/valid.json",
-    "tests/step3/invalid.json",
-    "tests/step4/valid.json",
-    "tests/step4/valid2.json",
-    "tests/step4/invalid.json",
-    "{\"names\": [\"Ruka\", \"Xero\", \"Hasan\"]}",
-    "[12, 13, 14, true, \"hi\"]"
-        ]
-
-for test in tests:
-    print(test)
-    try:
-        print(parse_json(test))
-    except ValueError as err:
-        print(err.args[0])
