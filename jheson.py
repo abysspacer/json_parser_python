@@ -385,3 +385,36 @@ def parse_json(data):
         return dic
     else:
         return arr
+
+def transform_to_json(data):
+    
+    def transform_to_json_data_format(data):
+        if type(data) == str:
+            return "\"data\""
+        if data is True:
+            return "true"
+        if data is False:
+            return "false"
+        if data is None:
+            return "null"
+        if type(data) == dict:
+            return get_json_object(data)
+        if type(data) == list:
+            return get_json_array(data)
+        return data
+
+    def get_json_object(dic):
+        statement = "{\n"
+        for (key, val) in dic.items():
+            statement += f"\"{key}\" : {transform_to_json_data_format(val)},\n"
+        return statement[:-2] + "\n}"
+
+    def get_json_array(arr):
+        statement = "[\n"
+        for val in arr:
+            statement += f"{transform_to_json_data_format(val)},\n"
+        return statement[:-2] + "\n]"
+
+    if type(data) != dict and type(data) != list:
+        return None
+    return transform_to_json_data_format(data)
